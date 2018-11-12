@@ -1,11 +1,8 @@
 /*
 *
-* Transform3DCuboid.cpp
-*
-*   This program shows a 3-D cuboid in rotation.
-*
 * To compile:
-*   gcc Transform3DCuboid.cpp -lglut -lGL -lGLU
+*   g++ Transform3DCuboid.cpp -lglut -lGL -lGLU
+*
 */
 #include <iostream>
 #include <stdlib.h>
@@ -13,12 +10,91 @@
 
 using namespace std;
 
+//Rotation variables
+float _angleX = 0.0f;
+float _angleY = 0.0f;
+float _angleZ = 0.0f;
+
+//Translation variables
+float translateX = 0.0f;
+float translateY = 0.0f;
+float translateZ = -20.0f;
+
+
 //Called when a key is pressed
 void handleKeypress(unsigned char key, int x, int y) {
     switch (key) {
         case 27: //Escape key
         exit(0);
+
+        //Translation with char keys (arrow keys in separate function below)
+        case 'i':                   //Scene moves down (Y-axis)
+        translateY -= 1.0f;
+        break;
+
+        case 'k':                   //Scene moves up (Y-axis)
+        translateY += 1.0f;
+        break;
+
+        //Rotation (follows right hand thumb rule)
+        case 'w':                   //Scene rotates about +ve X-axis
+        _angleX += 1.5f;
+        break;
+
+        case 's':                   //Scene rotates about -ve X-axis
+        _angleX -= 1.5f;
+        break;
+
+        case 'a':                   //Scene rotates about +ve Y-axis
+        _angleY += 1.5f;
+        break;
+
+        case 'd':                   //Scene rotates about -ve Y-axis
+        _angleY -= 1.5f;
+        break;
+
+        case 'j':                   //Scene rotates about +ve Z-axis 
+        _angleZ += 1.5f;
+        break;
+
+        case 'l':                   //Scene rotates about -ve Z-axis
+        _angleZ -= 1.5f;
+        break;
+
+        case 'r':                   //Reset Scene to initial state
+        _angleX = 0.0f;
+        _angleY = 0.0f;
+        _angleZ = 0.0f;
+
+        translateX = 0.0f;
+        translateY = 0.0f;
+        translateZ = -20.0f;
+
     }
+
+    glutPostRedisplay();            //redraw scene
+}
+
+//Called when special keys are pressed
+void specialInput(int key, int x, int y) {
+    switch(key)
+    {
+        case GLUT_KEY_UP:           //Scene zooms in (Z-axis)
+        translateZ += 1.0f;
+        break;  
+        case GLUT_KEY_DOWN:         //Scene zooms out (Z-axis)
+        translateZ -= 1.0f;
+        break;
+        case GLUT_KEY_LEFT:         //Scene goes left (X-Axis)
+        translateX -= 1.0f;
+        break;
+        case GLUT_KEY_RIGHT:        //Scene goes right (X-Axis)
+        translateX += 1.0f;
+        break;
+    }
+
+    glutPostRedisplay();
+
 }
 
 //Initializes 3D rendering
@@ -40,12 +116,10 @@ void handleResize(int w, int h) {
     gluPerspective(45.0, (double)w / (double)h, 1.0, 200.0);
 }
 
-float _angle = -70.0f;
-
 
 void drawCube(float dimensions[], float center[], float colour[]) {
 
-    //Set the colour here
+    //Color set here
     glColor3f(colour[0], colour[1], colour[2]);
     glBegin(GL_QUADS);
 
@@ -102,61 +176,70 @@ void drawScene() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    //Translate the entire system to some other place (can use this for manual camera motion?)
-    glTranslatef(0.0f, 0.0f, -20.0f);
+    //Translate the entire system to some other place (Used for scene interaction)
+    glTranslatef(translateX, translateY, translateZ);
+    glRotatef(_angleX, 1.0f, 0.0f, 0.0f);
+    glRotatef(_angleY, 0.0f, 1.0f, 0.0f);
+    glRotatef(_angleZ, 0.0f, 0.0f, 1.0f);
 
     //Add ambient light
-    GLfloat ambientColor[] = {0.2f, 0.2f, 0.2f, 1.0f}; //Color (0.2, 0.2, 0.2)
+    GLfloat ambientColor[] = {0.2f, 0.2f, 0.2f, 1.0f};
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
 
     //Add positioned light
-    GLfloat lightColor0[] = {0.5f, 0.5f, 0.5f, 1.0f}; //Color (0.5, 0.5, 0.5)
-    GLfloat lightPos0[] = {4.0f, 0.0f, 8.0f, 1.0f}; //Positioned at (4, 0, 8)
+    GLfloat lightColor0[] = {0.5f, 0.5f, 0.5f, 1.0f};
+    GLfloat lightPos0[] = {4.0f, 0.0f, 8.0f, 1.0f};
     glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor0);
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
 
     //Add directed light
-    GLfloat lightColor1[] = {0.5f, 0.2f, 0.2f, 1.0f}; //Color (0.5, 0.2, 0.2)
-    //Coming from the direction (-1, 0.5, 0.5)
+    GLfloat lightColor1[] = {0.5f, 0.2f, 0.2f, 1.0f};
     GLfloat lightPos1[] = {-1.0f, 0.5f, 0.5f, 0.0f};
     glLightfv(GL_LIGHT1, GL_DIFFUSE, lightColor1);
     glLightfv(GL_LIGHT1, GL_POSITION, lightPos1);
 
-    glRotatef(_angle, 1.0f, 0.0f, 1.0f);
-
     //Chair sample
 
+    //Back (red color)
     float dimensions[3], center[3], colour[3];
     dimensions[0] = 4.0f; dimensions[1] = 10.0f; dimensions[2] = 0.3f;
-    center[0] = 0.0f; center[1] = 0.0f; center[2] = -2.0f;
+    center[0] = 0.0f; center[1] = 0.0f; center[2] = -7.0f;
     colour[0] = 1.0f; colour[1] = colour[2] = 0.0f;
     drawCube(dimensions, center, colour);
 
+    //Front (green color)
     dimensions[0] = 4.0f; dimensions[1] = 5.0f; dimensions[2] = 0.3f;
-    center[0] = 0.0f; center[1] = -2.5f; center[2] = 2.0f;
+    center[0] = 0.0f; center[1] = -2.5f; center[2] = -3.0f;
     colour[1] = 1.0f; colour[0] = colour[2] = 0.0f;
     drawCube(dimensions, center, colour);
 
+    //Seat (blue color)
     dimensions[0] = 4.0f; dimensions[1] = 0.3f; dimensions[2] = 4.3f;
-    center[0] = 0.0f; center[1] = 0.0f; center[2] = 0.0f;
+    center[0] = 0.0f; center[1] = 0.0f; center[2] = -5.0f;
     colour[2] = 1.0f; colour[0] = colour[1] = 0.0f;
     drawCube(dimensions, center, colour);  
 
     //Chair sample end
 
+    //Table sample start
+    dimensions[0] = 12.0f; dimensions[1] = 0.3f; dimensions[2] = 8.6f;
+    center[0] = 0.0f; center[1] = 2.0f; center[2] = 0.0f;
+    colour[0] = 1.0f; colour[2] = colour[1] = 0.0f;
+    drawCube(dimensions, center, colour);  
+
+    dimensions[0] = 0.3f; dimensions[1] = 7.0f; dimensions[2] = 8.6f;
+    center[0] = 6.0f; center[1] = -1.5f; center[2] = 0.0f;
+    colour[1] = 1.0f; colour[2] = colour[0] = 0.0f;
+    drawCube(dimensions, center, colour); 
+
+    dimensions[0] = 0.3f; dimensions[1] = 7.0f; dimensions[2] = 8.6f;
+    center[0] = -6.0f; center[1] = -1.5f; center[2] = 0.0f;
+    colour[1] = 1.0f; colour[2] = colour[0] = 0.0f;
+    drawCube(dimensions, center, colour); 
+
     //BUG: flicker while rotating chair (probably due to changing views and decision of which surface to show)  
 
     glutSwapBuffers();
-}
-
-void update(int value) {
-    _angle += 1.5f;
-    if (_angle > 360) {
-        _angle -= 360;
-    }
-
-    glutPostRedisplay();
-    glutTimerFunc(25, update, 0);
 }
 
 int main(int argc, char** argv) {
@@ -172,10 +255,8 @@ int main(int argc, char** argv) {
     //Set handler functions
     glutDisplayFunc(drawScene);
     glutKeyboardFunc(handleKeypress);
+    glutSpecialFunc(specialInput);
     glutReshapeFunc(handleResize);
-
-    //Add a timer
-    glutTimerFunc(25, update, 0);
 
     glutMainLoop();
 }
