@@ -180,7 +180,7 @@ void drawScene() {
     glTranslatef(translateX, translateY, translateZ);
     glRotatef(_angleX, 1.0f, 0.0f, 0.0f);
     glRotatef(_angleY, 0.0f, 1.0f, 0.0f);
-    glRotatef(_angleZ, 1.0f, 0.0f, 1.0f);
+    glRotatef(_angleZ, 0.0f, 0.0f, 1.0f);
 
     //Add ambient light
     GLfloat ambientColor[] = {0.2f, 0.2f, 0.2f, 1.0f};
@@ -203,23 +203,39 @@ void drawScene() {
     //Back (red color)
     float dimensions[3], center[3], colour[3];
     dimensions[0] = 4.0f; dimensions[1] = 10.0f; dimensions[2] = 0.3f;
-    center[0] = 0.0f; center[1] = 0.0f; center[2] = -2.0f;
+    center[0] = 0.0f; center[1] = 0.0f; center[2] = -7.0f;
     colour[0] = 1.0f; colour[1] = colour[2] = 0.0f;
     drawCube(dimensions, center, colour);
 
     //Front (green color)
     dimensions[0] = 4.0f; dimensions[1] = 5.0f; dimensions[2] = 0.3f;
-    center[0] = 0.0f; center[1] = -2.5f; center[2] = 2.0f;
+    center[0] = 0.0f; center[1] = -2.5f; center[2] = -3.0f;
     colour[1] = 1.0f; colour[0] = colour[2] = 0.0f;
     drawCube(dimensions, center, colour);
 
     //Seat (blue color)
     dimensions[0] = 4.0f; dimensions[1] = 0.3f; dimensions[2] = 4.3f;
-    center[0] = 0.0f; center[1] = 0.0f; center[2] = 0.0f;
+    center[0] = 0.0f; center[1] = 0.0f; center[2] = -5.0f;
     colour[2] = 1.0f; colour[0] = colour[1] = 0.0f;
     drawCube(dimensions, center, colour);  
 
     //Chair sample end
+
+    //Table sample start
+    dimensions[0] = 12.0f; dimensions[1] = 0.3f; dimensions[2] = 8.6f;
+    center[0] = 0.0f; center[1] = 2.0f; center[2] = 0.0f;
+    colour[0] = 1.0f; colour[2] = colour[1] = 0.0f;
+    drawCube(dimensions, center, colour);  
+
+    dimensions[0] = 0.3f; dimensions[1] = 7.0f; dimensions[2] = 8.6f;
+    center[0] = 6.0f; center[1] = -1.5f; center[2] = 0.0f;
+    colour[1] = 1.0f; colour[2] = colour[0] = 0.0f;
+    drawCube(dimensions, center, colour); 
+
+    dimensions[0] = 0.3f; dimensions[1] = 7.0f; dimensions[2] = 8.6f;
+    center[0] = -6.0f; center[1] = -1.5f; center[2] = 0.0f;
+    colour[1] = 1.0f; colour[2] = colour[0] = 0.0f;
+    drawCube(dimensions, center, colour); 
 
     //BUG: flicker while rotating chair (probably due to changing views and decision of which surface to show)  
 
